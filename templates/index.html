@@ -7,6 +7,13 @@
 <body>
 <form action="/upload" enctype="multipart/form-data" method="post">
     <input type="file" name="upload" id="upload" multiple="multiple">
+    <label>
+        <select name="mode">
+            <option value=" ">default</option>
+            <option value="mygray">mygray</option>
+            <option value="giftgray">giftgray</option>
+        </select>
+    </label>
     <input type="submit" value="Upload file">
 </form>
 

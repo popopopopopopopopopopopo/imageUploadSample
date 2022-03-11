@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"image"
 	"image/jpeg"
+	"imageUploadSample/myImageLib"
 	"io"
 	"log"
 	"net/http"
@@ -55,21 +56,31 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	fileReader := io.Reader(file)
+
+	baseFileName := uuid.New().String() + ".jpeg"
+	mode := r.FormValue("mode")
+
 	baseDirectory := "tmp"
 	if f, err := os.Stat(baseDirectory); os.IsNotExist(err) || !f.IsDir() {
 		if err := os.Mkdir(baseDirectory, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	}
-	baseFileName := uuid.New().String() + ".jpeg"
-	f, err := os.Create(filepath.Join(baseDirectory, baseFileName))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
 
-	io.Copy(f, file)
+	newPath := filepath.Join(baseDirectory, baseFileName)
+	if mode == "mygray" {
+		scaleImage := myImageLib.CreateGrayScaleImage(&fileReader, newPath)
+		log.Println(scaleImage)
+	} else {
+		f, err := os.Create(newPath)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer f.Close()
+		io.Copy(f, fileReader)
+	}
 
 	targetFileName = baseFileName
 	http.Redirect(w, r, "/show", http.StatusFound)
