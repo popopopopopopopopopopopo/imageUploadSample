@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"image"
 	"image/jpeg"
+	"imageUploadSample/giftImageLib"
 	"imageUploadSample/myImageLib"
 	"io"
 	"log"
@@ -72,6 +73,12 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if mode == "mygray" {
 		scaleImage := myImageLib.CreateGrayScaleImage(&fileReader, newPath)
 		log.Println(scaleImage)
+	} else if mode == "colorize" {
+		dstImage := giftImageLib.CreateColorizeImage(&fileReader, newPath)
+		log.Println(dstImage)
+	} else if mode == "invert" {
+		dstImage := giftImageLib.CreateInvertImage(&fileReader, newPath)
+		log.Println(dstImage)
 	} else {
 		f, err := os.Create(newPath)
 		if err != nil {
